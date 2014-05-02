@@ -1,0 +1,105 @@
+  Crea tu propio repositorio Debian/Ubuntu mediante apt-mirror
+En numerosas ocasiones tener tu repositorio local puede ser de gran ayuda. Si estas trabajando construyendo sistemas Debian live o tienes una red local, puedes ahorrar mucho tiempo en las actualizaciones e instalaciones. En el mundo del embedded te puede convenir tener un repositorio congelado a día y hora que hayas elegido para si un día necesitas instalar un nuevo paquete en un sistema congelado, no tener problemas de dependencias de paquetes ni que el sistema te obligue a actualizar nada, o simplemente si quieres construir un sistema live basado en las mismas versiones de paquetes que el sistema congelado.
+
+apt-mirror es un software que se encarga de hacer un mirror local de los repositorios Debian/Ubuntu indicados. Su ejecución se programa en el cron. Para instalar apt-mirror:
+$ apt-get install apt-mirror
+Para configurar apt-mirror hay que editar el fichero /etc/apt/mirror.list. Un ejemplo del fichero configuración para Debian Wheezy y arquitectura i386:
+
+############# config ##################
+#
+set base_path    /mnt/repositories
+#
+ set mirror_path  $base_path/mirror
+ set skel_path    $base_path/skel
+ set var_path     $base_path/var
+# set cleanscript $var_path/clean.sh
+# set defaultarch  <running architecture="" host="">
+set defaultarch i386
+# set postmirror_script $var_path/postmirror.sh
+# set run_postmirror 0
+#set distribution testing
+set nthreads     20
+set _tilde 0
+#set limit_rate 2.5k
+############# end config ##############
+ 
+deb http://ftp.es.debian.org/debian/ wheezy main contrib non-free
+deb http://security.debian.org/ testing/updates main contrib non-free
+deb http://oktan.ls.fi.upm.es/debian-multimedia/ wheezy main non-free
+deb http://download.virtualbox.org/virtualbox/debian/ squeeze contrib non-free
+deb http://ppa.launchpad.net/ubuntu-wine/ppa/ubuntu oneiric main
+deb http://deb.playonlinux.com/ squeeze main
+deb http://live.debian.net/ wheezy-snapshots main contrib non-free
+# PPA OGRE
+deb http://ppa.launchpad.net/ogre-team/ogre/ubuntu oneiric main 
+# Debian installer
+deb http://ftp.es.debian.org/debian wheezy main/debian-installer
+ 
+ 
+clean http://ftp.es.debian.org/debian
+clean deb http://security.debian.org
+clean http://oktan.ls.fi.upm.es/debian-multimedia
+clean http://download.virtualbox.org/virtualbox/debian
+clean http://ppa.launchpad.net/ubuntu-wine/ppa/ubuntu
+clean http://deb.playonlinux.com
+clean http://live.debian.net
+clean http://ppa.launchpad.net/ogre-team/ogre/ubuntu
+</running>
+
+
+En el fichero de configuración se diferencian rápidamente tres secciones:
+Configuración.
+Repositorios a descargar.
+Sección clean.
+La sección clean sirve para que si aparece una nueva versión de un paquete, la antigua versión se borre del repositorio local. De esta manera se ahorra espacio en el disco donde se aloje el repositorio local.
+En la sección de configuración destacamos:
+
+base_path: El path donde se almacenara los paquetes del mirror.
+defaultarch: Si no nos interesa descargar todas las arquitecturas, conviene indicar la arquitectura deseada para ahorrar espacio en el disco y tiempo de mirroring.
+nthreads: El numero de threads que ejecutar wget para comprobar los paquetes de los repositorios. 
+limit_rate: Si deseamos limitar la tasa de descarga por thread.
+Para empezar a bajar todos los paquetes y realizar el mirror ejecutamos:
+
+$ su - apt-mirror -c apt-mirror
+Aunque lo mejor es dejarle el trabajo al demonio cron para que lo realice diariamente. Para ello se crea un script, por ejemplo, llamado apt-mirror en /etc/cron.daily: 
+
+
+#!/bin/sh
+ 
+su - apt-mirror -c apt-mirror
+
+
+Ahora hay que publicar los repositorios del mirror en un servidor web. El servidor web en este ejemplo utiliza como directorio /var/www, por lo tanto
+
+
+cd /var/wwww
+ln -s /mnt/repositories/mirror/ftp.es.debian.org/debian/ debian
+ln -s /mnt/repositories/mirror/oktan.ls.fi.upm.es/debian-multimedia/ debian-multimedia
+ln -s /mnt/repositories/mirror/deb.playonlinux.com/ deb.playonlinux.com
+ln -s /mnt/repositories/mirror/live.debian.net/ live.debian.net
+ln -s /mnt/repositories/mirror/ppa.launchpad.net/ogre-team/ogre/ubuntu/ ogre
+ln -s /mnt/repositories/mirror/security.debian.org security.debian.org
+ln -s /mnt/repositories/mirror/download.virtualbox.org/virtualbox/debian/ virtualbox
+ln -s /mnt/repositories/mirror/ppa.launchpad.net/ubuntu-wine/ppa/ubuntu/ wine
+
+
+Y por último configurar el fichero /etc/apt/sources.list de cada cliente: 
+
+
+deb http://localhost/debian/ wheezy main contrib non-free
+deb http://localhost/security.debian.org/ testing/updates main contrib non-free
+# Multimedia mirror spain
+deb http://localhost/debian-multimedia/ wheezy main non-free
+# Debian Live
+deb http://localhost/live.debian.net/ wheezy-snapshots main contrib non-free
+# PlayOnLinux
+deb http://localhost/deb.playonlinux.com/ squeeze main
+### VirtualBox ###
+deb http://localhost/virtualbox/ squeeze contrib non-free
+# Ogre Team
+deb http://localhost/ogre/ oneiric main
+# Wine
+deb http://localhost/wine oneiric main 
+
+En este ejemplo se ha creado un mirror local en el path /mnt/repositories. Evidentemente podría crearse el repositorio en otro ordenador que haga de servidor y en cualquier path.
+
