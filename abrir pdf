@@ -1,0 +1,14 @@
+Cómo abrir un archivo PDF desde la línea del comando
+Instrucciones
+
+1
+Accede a la línea de comando desde el escritorio de Gnome desplegando el menú de "Aplicaciones", generalmente ubicado en el vértice izquierdo más alto de la pantalla; selecciona "Accesorios" y luego "Terminal". Navega por el directorio donde esté ubicado el archivo PDF. Ingresa el siguiente comando en el indicador sin las comillas "gnome-open filename.pdf", reemplazando la palabra "filename" con el nombre del archivo PDF que quieres arrir. Luego presiona "Intro".
+
+2
+Inicia el mismo lector de PDF desde el símbolo del sistema navegando al directorio donde está ubicado el archivo PDF e ingresa el siguiente comando sin las comillas "evince filename.pdf", reemplazando la palabra "file name" con el nombre del archivo PDF que deseas abrir y presiona la tecla "Intro".
+
+3
+Instala un lector alternativo de PDF, usando el siguiente comando en el sistema "sudo apt-get install acroread" (sin comillas), seguido por el ingreso de tu contraseña en la casilla de aviso y presiona la tecla "Intro". Cuando haya finalizado la instalación, escribe el siguiente comando en la línea de comando solicitada para iniciar el Adobe Reader, "acroread filename.pdf", reemplazando la palabra "file name" con el nombre del archivo PDF que deseas abrir y presiona "Intro".
+
+4
+Instala otro lector de PDF alternativo usando el siguiente comando en la casilla indicadora, "sudo apt-get install xpdf" (sin comillas) seguido por tu clave cuando aparezca la casilla y luego presiona la tecla "Intro". Cuando la instalación haya finalizado, escribe el siguiente comando en la casilla de aviso para iniciar el Adobe reader, "xpdf filename.pdf" reemplazando la palabra file name con el nombre del archivo PDF que deseas abrir y presiona "Intro".
